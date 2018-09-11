@@ -1,17 +1,25 @@
 /*
     A library of functions to produce a trace JSON file describing the events that
     happened, to be used with another program.
+
+    Current Functions:
+
+    trace_start
+    trace_flush
+    trace_end
+    trace_event_start
+    trace_event_end
+    trace_object_new
+    trace_object_gone
 */
 #ifndef TRACELIB_H_INCLUDED
 #define TRACELIB_H_INCLUDED
 
 #include <vector>
-#include <string.h>
-#include <string>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <chrono>
-#include <map>
 
 namespace trace
 {
@@ -80,7 +88,7 @@ inline void trace_end()
 {
     dataVector.back().pop_back(); dataVector.back().pop_back(); //Remove last two elements (",\n")
     trace_flush();
-    traceFile << "\n]";
+    traceFile << "\n]"; //Closing Brace of JSON
     traceFile.close();
 }
 
