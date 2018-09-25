@@ -11,6 +11,9 @@
     trace_event_end
     trace_object_new
     trace_object_gone
+    
+    trace_instant_global
+    trace_counter
 */
 #ifndef TRACELIB_H_INCLUDED
 #define TRACELIB_H_INCLUDED
@@ -224,6 +227,29 @@ void trace_object_gone(const char* name, const void* obj_pointer)
     dataVector.push_back(stringBuffer);
 }
 
+void trace_instant_global(char* name)
+{
+	if( dataVector.size() == dataVector.capacity() ) trace_flush(); //Flush if full
+
+    // Assuming all instant events  will have scope set to global
+    sprintf(stringBuffer,
+    "{\"name\": \"%s\", \"ph\": \"i\", \"pid\": %i, \"tid\": %i, \"ts\": %i},\n",
+    name,	PID_VALUE,  TID_VALUE,  int(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now()-startTime).count()) );
+
+    dataVector.push_back(stringBuffer);
 }
 
+void trace_counter(char* name, char* key, char* value)
+{
+    if( dataVector.size() == dataVector.capacity() ) trace_flush(); //Flush if full
+    
+    // Assuming the counter is only tracking one set of data
+    sprintf(stringBuffer,
+    "{\"name\": \"%s\", \"ph\": \"C\", \"ts\": %i}, \"args\": { \"%s\" : \"%s\" } }\n",
+    name,  int(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now()-startTime).count()), 	key,	 );
+
+    dataVector.push_back(stringBuffer);
+
+}
+}
 #endif // TRACELIB_H_INCLUDED
